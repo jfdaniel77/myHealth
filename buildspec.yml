@@ -2,8 +2,6 @@ version: 0.2
 
 env:
   variables:
-SOLUTION: .\MvcApplication.sln
-    PACKAGE_DIRECTORY: .\packages
     PROJECT: MvcApplication
     DOTNET_FRAMEWORK: 4.7.2
 phases:
