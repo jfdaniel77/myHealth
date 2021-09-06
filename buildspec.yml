@@ -7,8 +7,9 @@ env:
 phases:
   build:
     commands:
-      - msbuild $env:PROJECT.csproj /p:TargetFrameworkVersion=v$env:DOTNET_FRAMEWORK /p:Configuration=Release /p:DeployIisAppPath="Default Web Site" /p:PackageAsSingleFile=false /p:OutDir=D:\codebuild\artifacts\ /t:Package
+ - nuget restore
+      - msbuild.exe $env:PROJECT.csproj /p:TargetFrameworkVersion=v$env:DOTNET_FRAMEWORK /p:Configuration=Release /p:DeployIisAppPath="Default Web Site" /p:PackageAsSingleFile=false /p:OutDir=C:\codebuild\artifacts\ /t:Package
 artifacts:
   files:
     - '**/*'
-  base-directory: 'D:\codebuild\artifacts\_PublishedWebsites\${env:PROJECT}_Package\Archive\'
+  base-directory: 'C:\codebuild\artifacts\_PublishedWebsites\${env:PROJECT}_Package\Archive\'
