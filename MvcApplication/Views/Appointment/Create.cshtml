@@ -7,7 +7,9 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-
+        $('#PatientId').val(sessionStorage.getItem('loginUserId'));
+        $('#txtPatientName').val(sessionStorage.getItem('loginUserName'));
+        $('#txtPatientName').prop('disabled',true);
         filterDoctors();
 
         $.ajax(
@@ -87,19 +89,17 @@
 
 @using (Html.BeginForm()) 
 {
-    @Html.AntiForgeryToken()
     
 <div class="form-horizontal">
     <h4>Book Appointment</h4>
     <hr />
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    @*<div class="form-group">
-            @Html.LabelFor(model => model.AppointmentId, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="form-group">
+        <label class="control-label col-md-2">Patient</label>
             <div class="col-md-10">
-                @Html.EditorFor(model => model.AppointmentId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.AppointmentId, "", new { @class = "text-danger" })
+                <input type="text" class = "form-control" id="txtPatientName" />
             </div>
-        </div>*@
+        </div>
 
     <div class="form-group">
         @*@Html.LabelFor(model => model.PatientId, htmlAttributes: new { @class = "control-label col-md-2" })*@

@@ -8,6 +8,13 @@
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
 </head>
+
+<script type="text/javascript">
+    function clearSessionStorage() {
+        sessionStorage.clear();
+    }
+</script>
+
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
@@ -22,7 +29,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Dashboard", "Home")</li>
-                    <li>@Html.ActionLink("Tokens", "Tokens", "Account")</li>
+                    @*<li>@Html.ActionLink("Tokens", "Tokens", "Account")</li>*@
                     <li>@Html.ActionLink("Appointments", "Appointment", "Home")</li>
                     <li>@Html.ActionLink("Health Records", "HealthRecords", "Home")</li>
                     <li>@Html.ActionLink("Medications", "Medications", "Home")</li>
@@ -33,7 +40,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li>@Html.ActionLink("Logout", "Logout", "Account")</li>
+                        <li>@Html.ActionLink("Logout", "Logout", "Account",null, new { onclick = "clearSessionStorage()"})</li>
                     }
                     else
                     {

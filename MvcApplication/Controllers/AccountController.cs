@@ -21,6 +21,8 @@ namespace MvcApplication.Controllers
         [Authorize]
         public void Logout()
         {
+            HttpContext.Session.RemoveAll();
+            
             HttpContext.GetOwinContext().Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType);
             HttpContext.GetOwinContext().Authentication.SignOut("Auth0");
         }

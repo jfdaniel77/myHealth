@@ -2,7 +2,37 @@
     ViewBag.Title = "Home Page";
 }
 @using System.Security.Claims
+<script type="text/javascript">
+    $(document).ready(function () {
 
+        var loginUserEmail = '@Session["email"]';
+
+
+    $.ajax(
+        {
+            url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/' + loginUserEmail,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            crossDomain: true,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                sessionStorage.setItem('loginEmail', data.EMAIL);
+                sessionStorage.setItem('loginUserId', data.USER_ID);
+                sessionStorage.setItem('loginUserName', data.FULL_NAME);
+                if (data.ROLE_C == 2) {
+                    sessionStorage.setItem('loginRole', 'Doctor');
+                }
+                else {
+                    sessionStorage.setItem('loginRole', 'Patient');
+                }
+            }
+        });
+
+    });
+
+</script>
 <div class="jumbotron">
     <h1>MyHealth</h1>
     <p class="lead">

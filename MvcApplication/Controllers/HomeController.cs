@@ -7,6 +7,16 @@ namespace MvcApplication.Controllers
         
         public ActionResult Dashboard()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                //string email = ((ClaimsIdentity)User.Identity).FindFirst("nickname").Value;
+                string email = "jsandeau@gmail.com";
+                Session["email"] = email;
+            }
+            else
+            {
+                Response.Redirect("~/Account/Login");
+            }
             return View();
         }
         public ActionResult Appointment()
