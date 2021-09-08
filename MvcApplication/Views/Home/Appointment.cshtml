@@ -1,0 +1,96 @@
+﻿@{
+    ViewBag.Title = "My Appointments";
+}
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Book an Appointment</h2>
+
+        <p><a class="btn btn-default" href="/Appointment/Create"><i class="glyphicon glyphicon-bookmark"></i> Book &raquo;</a></p>
+    </div>
+
+</div>
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Upcoming Appoints</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Past Appointments</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Consultations Booked</a>
+    </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+        <div class="tab-content">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Doctor</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Mark Otto</td>
+                        <td>1 Oct 2021</td>
+                        <td>D&M Dental Clinic, Queenstown</td>
+                        <td>Dental - Polishing</td>
+
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Doctor</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>Mark Otto</td>
+                    <td>1 Oct 2020</td>
+                    <td>D&M Dental Clinic, Queenstown</td>
+                    <td>Dental - Polishing</td>
+
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Jacob Thornton</td>
+                    <td>10 Oct 2020</td>
+                    <td>Minmed Clinic, Orchard</td>
+                    <td>Medical Checkup </td>
+
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Mark Otto</td>
+                    <td>1 Dec 2020</td>
+                    <td>D&M Dental Clinic, Queenstown</td>
+                    <td>Dental - Filing</td>
+
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+        <p class="text-danger">This tab is accessible to the doctors only</p>
+    </div>
+</div>

@@ -12,7 +12,7 @@ namespace MvcApplication.Controllers
         {
             HttpContext.GetOwinContext().Authentication.Challenge(new AuthenticationProperties
                 {
-                    RedirectUri = returnUrl ?? Url.Action("Index", "Home")
+                    RedirectUri = returnUrl ?? Url.Action("Dashboard", "Home")
                 },
                 "Auth0");
             return new HttpUnauthorizedResult();
@@ -32,7 +32,7 @@ namespace MvcApplication.Controllers
 
             ViewBag.AccessToken = claimsIdentity?.FindFirst(c => c.Type == "access_token")?.Value;
             ViewBag.IdToken = claimsIdentity?.FindFirst(c => c.Type == "id_token")?.Value;
-
+            ViewBag.Email = claimsIdentity?.FindFirst(c => c.Type == "email")?.Value;
             return View();
         }
 

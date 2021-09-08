@@ -1,0 +1,165 @@
+﻿@model Models.AppointmentModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        filterDoctors();
+
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/specialty',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var options = " <option>SELECT Specialty</option>";
+
+                    data.forEach(function (obj) {
+
+                        options = options + "<option value = '" + obj.SPECIALTY_C + "'>" + obj.SPECIALTY_T + "</option>";
+                    });
+
+                    $('#ddlSpecialty').html(options);
+                }
+            });
+    })
+
+
+    function filterDoctors() {
+        var specialtyName = $('#ddlSpecialty').find("option:selected").text();
+        if (specialtyName !== "SELECT Specialty") {
+            $.ajax(
+                {
+                    url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/doctor?specialty=' + specialtyName,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossDomain: true,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        var options = " <option>SELECT Doctors</option>";
+
+                        data.forEach(function (obj) {
+
+                            options = options + "<option value = '" + obj.USER_ID + "'>" + obj.FULL_NAME + "</option>";
+                        });
+
+                        $('#ddlDoctor').html(options);
+                    }
+                });
+        }
+        else {
+            getAllDoctors();
+        }
+    }
+    function getAllDoctors() {
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/doctor',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var options = " <option>SELECT Doctors</option>";
+
+                    data.forEach(function (obj) {
+
+                        options = options + "<option value = '" + obj.USER_ID + "'>" + obj.FULL_NAME + "</option>";
+                    });
+
+                    $('#ddlDoctor').html(options);
+                }
+            }); 
+    }
+</script>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>Book Appointment</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.AppointmentId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AppointmentId, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.AppointmentId, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.PatientId, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.PatientId, new { htmlAttributes = new { @class = "form-control", style = "display:none" } })
+            @*@Html.ValidationMessageFor(model => model.PatientId, "", new { @class = "text-danger" })*@
+        </div>
+    </div>
+    <div class="form-group">
+        <label class = "control-label col-md-2">Specialty</label>
+        <div class="col-md-10">
+            <select class="form-control" id="ddlSpecialty" onchange="filterDoctors()">
+                <option>SELECT Specialty</option>
+            </select>
+            
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.DoctorId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <select class="form-control" id="ddlDoctor">
+                <option>SELECT Doctors</option>
+            </select>
+            @Html.ValidationMessageFor(model => model.DoctorId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.AppointmentDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+
+        <div class="col-md-4">
+            @Html.EditorFor(model => model.AppointmentDateTime, new { htmlAttributes = new { @class = "form-control", type = "date" } })
+        </div>
+        <div class="col-md-4">
+            @Html.EditorFor(model => model.AppointmentDateTime, new { htmlAttributes = new { @class = "form-control", type = "time" } })
+        </div>
+        @Html.ValidationMessageFor(model => model.AppointmentDateTime, "", new { @class = "text-danger col-md-10" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-success" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

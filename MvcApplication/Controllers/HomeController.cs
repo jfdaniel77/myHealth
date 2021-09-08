@@ -9,14 +9,14 @@ namespace MvcApplication.Controllers
         {
             return View();
         }
-        public ActionResult About()
+        public ActionResult Appointment()
         {
             ViewBag.Message = "Your application description page.";
 
             return View();
         }
 
-        public ActionResult Contact()
+        public ActionResult HealthRecords()
         {
             ViewBag.Message = "Your contact page.";
 

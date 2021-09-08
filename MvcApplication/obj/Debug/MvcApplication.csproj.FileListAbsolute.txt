@@ -158,7 +158,6 @@ D:\groupproj\MvcApplication\MvcApplication\bin\System.Web.Razor.xml
 D:\groupproj\MvcApplication\MvcApplication\bin\System.Web.WebPages.xml
 D:\groupproj\MvcApplication\MvcApplication\bin\System.Web.WebPages.Deployment.xml
 D:\groupproj\MvcApplication\MvcApplication\bin\System.Web.WebPages.Razor.xml
-D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.csprojAssemblyReference.cache
 D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.csproj.CoreCompileInputs.cache
 D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.csproj.CopyComplete
 D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.dll
