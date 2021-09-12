@@ -3,17 +3,165 @@
 }
 <h2>@ViewBag.Title</h2>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        var role = sessionStorage.getItem('loginRole');
+        var userId = sessionStorage.getItem('loginUserId');
+        if (role == 'Doctor') {
+            $.ajax(
+                {
+                    url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/doctor/' + userId,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossDomain: true,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#tblDoctorAppointments tbody').empty();
+                        $.each(data, function (i, item) {
+
+                            var appointmentId = item.ID;
+                            var patientId = item.PATIENT_ID;
+
+                            var patient = item.PATIENT_FULLNAME;
+                            var date = item.APPT_DT.replace(/\/Date\((-?\d+)\)\//, '$1');
+                            var date_full = new Date(parseInt(date));
+
+                            var appointmentTime = item.APPT_SLOT;
+                            var locationName = item.LOCATION_NAME;
+                            var locationDetail = item.LOCATION_ADDRESS;
+                            var appointmentStatus = item.STATUS;
+
+                            var rows = "<tr>"
+                                + "<td>" + patient + "</td>"
+                                + "<td>" + date + " " + appointmentTime + "</td>"
+
+
+                                + "<td>" + locationName + "<br/>" + locationDetail + "</td>"
+                                + "<td>" + appointmentStatus + "</td>"
+                                + "<td><button class = 'btn btn-danger' type = 'button' onclick = 'CancelAppointment(\"" + appointmentId + "\",\"" + patientId + "\")' title = 'Cancel Appointment'><i class='glyphicon glyphicon-remove' ></i></button></td>"
+                                + "</tr>";
+
+                            $('#tblDoctorAppointments tbody').append(rows);
+
+
+                        });
+
+
+                    }
+                });
+
+
+        }
+        else {
+            $('#pills-contact-tab').prop('style', 'display:none');
+        }
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/patient/' + userId,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#tblPatientUpcomingAppointments tbody').empty();
+                    $('#tblPatientPastAppointments tbody').empty();
+                    $.each(data, function (i, item) {
+                        var doctor = item.DOCTOR_FULLNAME;
+                        var date = item.APPT_DT;
+
+                        var dateparts = date.split('/');
+                        var day = parseInt(dateparts[0]);
+                        var month = parseInt(dateparts[1]);
+                        var year = parseInt(dateparts[2]);
+
+                        var full_date = new Date(year + '-' + month + '-' + day);
+                        
+
+                        var appointmentId = item.ID;
+                        var appointmentTime = item.APPT_SLOT;
+                        var locationName = item.LOCATION_NAME;
+                        var locationDetail = item.LOCATION_ADDRESS;
+                        var locationURI = item.LOCATION_URL;
+                        var appointmentStatus = item.STATUS;
+
+                        var fullLocation = '';
+
+                        if (locationName == 'ONLINE') {
+                            fullLocation = locationName + "<br/>" + locationDetail + " - <a href='" + locationURI + "'>" + locationURI + " <i class='glyphicon glyphicon-link'></i></a>";
+                        }
+                        else {
+                            fullLocation = locationName + "<br/>" + locationDetail;
+                        }
+
+
+                        //if (item.BookingTo === "11:59 PM" && item.BookingFrom === "12:00 AM") {
+                        var rows = "<tr>"
+                            + "<td>" + doctor + "</td>"
+                            + "<td>" + date + " " + appointmentTime + "</td>"
+
+
+                            + "<td>" + fullLocation + "</td>"
+                            + "<td>" + appointmentStatus + "</td>"
+                            + "<td><button class = 'btn btn-danger' type = 'button' onclick = 'CancelAppointment(\"" + appointmentId + "\",\"" + userId + "\")' title = 'Cancel Appointment'><i class='glyphicon glyphicon-remove' ></i></button></td>"
+                            + "</tr>";
+
+                        if (full_date > new Date()) {
+                            $('#tblPatientUpcomingAppointments tbody').append(rows);
+                        }
+                        else {
+                            $('#tblPatientPastAppointments tbody').append(rows);
+                        }
+
+                        
+
+
+                    });
+
+
+                }
+            });
+
+    });
+
+    function CancelAppointment(appId, patId) {
+        //alert(appId);
+        //alert(patId);
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/appointment/patient/' + appId,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'DELETE',
+                dataType: 'json',
+                
+                success: function (data) {
+
+
+
+
+                    alert(data);
+                }
+            });
+    }
+</script>
+
 <div class="row">
     <div class="col-md-4">
         <h2>Book an Appointment</h2>
-
+        
         <p><a class="btn btn-default" href="/Appointment/Create"><i class="glyphicon glyphicon-bookmark"></i> Book &raquo;</a></p>
     </div>
 
 </div>
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Upcoming Appoints</a>
+        <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Upcoming Appointments</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Past Appointments</a>
@@ -23,74 +171,55 @@
     </li>
 </ul>
 <div class="tab-content" id="pills-tabContent">
-    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+    <div class="tab-pane fade" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
         <div class="tab-content">
-            <table class="table">
+            <table class="table table-responsive" id="tblPatientUpcomingAppointments">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Doctor</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Location</th>
-                        <th scope="col">Description</th>
+                        <th>Doctor</th>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark Otto</td>
-                        <td>1 Oct 2021</td>
-                        <td>D&M Dental Clinic, Queenstown</td>
-                        <td>Dental - Polishing</td>
 
-                    </tr>
-                    
                 </tbody>
             </table>
         </div>
         
     </div>
     <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Doctor</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Location</th>
-                    <th scope="col">Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark Otto</td>
-                    <td>1 Oct 2020</td>
-                    <td>D&M Dental Clinic, Queenstown</td>
-                    <td>Dental - Polishing</td>
-
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob Thornton</td>
-                    <td>10 Oct 2020</td>
-                    <td>Minmed Clinic, Orchard</td>
-                    <td>Medical Checkup </td>
-
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Mark Otto</td>
-                    <td>1 Dec 2020</td>
-                    <td>D&M Dental Clinic, Queenstown</td>
-                    <td>Dental - Filing</td>
-
-                </tr>
-            </tbody>
-        </table>
-
+        <div class="tab-content">
+            <table class="table table-responsive" id="tblPatientPastAppointments">
+                <thead>
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
-        <p class="text-danger">This tab is accessible to the doctors only</p>
+        <div class="tab-content">
+            <table class="table table-responsive" id="tblDoctorAppointments">
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>    
     </div>
 </div>

@@ -7,6 +7,7 @@
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
+    
 </head>
 
 <script type="text/javascript">
@@ -34,24 +35,44 @@
                     <li>@Html.ActionLink("Health Records", "HealthRecords", "Home")</li>
                     <li>@Html.ActionLink("Medications", "Medications", "Home")</li>
                     <li>@Html.ActionLink("Notifications", "Notifications", "Home")</li>
-                    <li>@Html.ActionLink("MyProfile", "MyProfile", "Home")</li>
+                    
+                    
 
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
+                <div class="btn-group nav navbar-nav navbar-right ">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li>@Html.ActionLink("Logout", "Logout", "Account",null, new { onclick = "clearSessionStorage()"})</li>
+                        
+                        <div class="btn  dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white; padding-top:1em;">
+                            @User.Identity.Name <i class="glyphicon glyphicon-menu-down"></i>
+                        </div>
+
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <li> @Html.ActionLink(" MyProfile", "MyProfile", "Home", null, new { @class = "dropdown-item btn glyphicon glyphicon-user" })</li>
+                            <li><a  class="dropdown-item btn glyphicon glyphicon-comment" href="#" data-toggle="modal" data-target="#exampleModal"> Feedback</a></li>
+                            
+                            <li>@Html.ActionLink(" Logout", "Logout", "Account", null, new { onclick = "clearSessionStorage()", @class = "dropdown-item btn glyphicon glyphicon-off" })</li>
+
+
+
+                        </ul>
+
                     }
                     else
                     {
-                        <li>@Html.ActionLink("Login", "Login", "Account")</li>
+                        <ul class="nav navbar-nav">
+                            <li> @Html.ActionLink("Login", "Login", "Account")</li>
+                        </ul>
+
                     }
-                </ul>
+                </div>
             </div>
         </div>
     </div>
     <div class="container body-content">
         @RenderBody()
+
+        @Html.Partial("_GiveFeedback")
         <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>

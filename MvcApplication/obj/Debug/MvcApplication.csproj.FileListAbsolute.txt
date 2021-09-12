@@ -162,4 +162,3 @@ D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.csproj.CoreC
 D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.csproj.CopyComplete
 D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.dll
 D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.pdb
-D:\groupproj\MvcApplication\MvcApplication\obj\Debug\MvcApplication.csprojAssemblyReference.cache
