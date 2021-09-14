@@ -10,7 +10,7 @@ namespace MvcApplication.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 //string email = ((ClaimsIdentity)User.Identity).FindFirst("nickname").Value;
-                string email = "mgray@yahoo.com";
+                string email = "jdolittle@hotmail.com";
                 Session["email"] = email;
             }
             else

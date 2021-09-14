@@ -57,6 +57,7 @@
 </style>
 
 <script type="text/javascript">
+
     $(document).ready(function () {
 
         $("input[type='radio']").click(function () {
@@ -71,26 +72,40 @@
         alert('test the change');
         $.ajax(
             {
-                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/feedback/1000677',
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/feedback/1001495',
                 headers: {
-                    'Content-Type': 'application/json'
+                    "Content-Type": "application/json"
                 },
-                crossDomain: true,
+                
                 type: 'POST',
                 dataType: 'json',
+                crossDomain: true,
+                format:"json",
                 data: {
-                    MESSAGE_T: 'hi',
-                    RATING:'4'
+                    "MESSAGE_T": "Hello World",
+                    "RATING": "4",
                 },
                 success: function (data) {
-
-
-                   
-
-                    alert(data);
+                    alert('called');
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    alert(errorThrown);
                 }
+                
             });
-
+        //const response = await axios({
+        //    method: "post",
+        //    url: `https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/feedback/1000685`,
+        //    headers: {
+        //        "Content-Type": "application/json",
+        //    },
+        //    data: {
+        //        MESSAGE_T: "Usefull Application and I like the UI. Hello World",
+        //        RATING: "5",
+        //    },
+        //}).then((response) => {
+        //    console.log(response);
+        //});
     
         $('#btnRate').html('<i class="glyphicon glyphicon-pencil"></i> Send Feedback');
     }

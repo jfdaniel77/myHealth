@@ -6,12 +6,39 @@
 }
 
 <script type="text/javascript">
+    var $myBadDates = new Array();
+
     $(document).ready(function () {
         $('#PatientId').val(sessionStorage.getItem('loginUserId'));
         $('#txtPatientName').val(sessionStorage.getItem('loginUserName'));
-        $('#txtPatientName').prop('disabled',true);
+        $('#txtPatientName').prop('disabled', true);
         filterDoctors();
+        $(function () {
+            
+            var today = new Date();
+            var thisMonth = today.getMonth() + 1 < 10 ? "0" + (today.getMonth() + 1) : today.getMonth()+1;
+            var startDate = "01/" + thisMonth + "/" + today.getFullYear();
+            var nextMonth = today.getMonth() + 2;
+            
+            if (nextMonth > 12) {
+                nextMonth = nextMonth - 12;
+                var nextYear = today.getFullYear() + 1;
+            }
+            else {
+                var nextYear = today.getFullYear();
+            }
+            var enddate = "30/" + nextMonth + "/" + nextYear;
+            
 
+            $("#txtDate").datepicker({
+                dateFormat: 'dd/mm/yy',
+                minDate: startDate,
+                maxDate: enddate,
+
+                beforeShowDay: checkBadDates
+            });
+
+        });
         $.ajax(
             {
                 url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/specialty',
@@ -34,6 +61,18 @@
             });
     })
 
+    function checkBadDates(mydate) {
+        var $return = false;
+        var $returnclass = "unavailable";
+        $checkdate = $.datepicker.formatDate('dd/mm/yy', mydate);
+        for (var i = 0; i < $myBadDates.length; i++) {
+            if ($myBadDates[i] == $checkdate) {
+                $return = true;
+                $returnclass = "available";
+            }
+        }
+        return [$return, $returnclass];
+    }
 
     function filterDoctors() {
         var specialtyName = $('#ddlSpecialty').find("option:selected").text();
@@ -83,78 +122,283 @@
 
                     $('#ddlDoctor').html(options);
                 }
-            }); 
+            });
     }
+
+    function filterTimeslots() {
+
+        var patientId = $('#PatientId').val();
+        var doctorId = $('#ddlDoctor').find("option:selected").val();
+
+        var selectedDate = $('#txtDate').val();
+
+        //var day = selectedDate.getDate() < 10 ? "0" + selectedDate.getDate() : selectedDate.getDate();
+        //var month = selectedDate.getMonth() + 1 < 10 ? "0" + (selectedDate.getMonth() + 1) : selectedDate.getMonth() + 1;
+        //var dateToCheckKey = day + "/" + month + "/" + selectedDate.getFullYear();
+
+
+        $('#ddlTimeSlots').html(" <option>SELECT Timeslot</option>");
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/availbility/' + patientId + '/' + doctorId + '',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var options = " <option>SELECT Timeslot</option>";
+
+                    Object.entries(data).forEach(([key, value]) => {
+                        if (key == selectedDate) {
+                            value.forEach(function (obj) {
+
+                                options = options + "<option value = '" + obj + "'>" + obj + "</option>";
+                            });
+
+                        }
+                    });
+
+                    $('#ddlTimeSlots').html(options);
+                }
+            });
+    }
+
+    function filterLocation() {
+        var doctorName = $('#ddlDoctor').find("option:selected").text();
+        var patientId = $('#PatientId').val();
+        var doctorId = $('#ddlDoctor').find("option:selected").val();
+        if (doctorName !== "SELECT Doctor") {
+            $.ajax(
+                {
+                    url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/doctor?name=' + doctorName,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossDomain: true,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        var options = " <option>SELECT Location</option>";
+
+                        data.forEach(function (obj) {
+
+                            obj.LOCATION.forEach(function (location) {
+                                options = options + "<option value = '" + location.LOCATION_C + "'>" + location.LOCATION_NAME + " (" + location.LOCATION_ADDRESS + ") </option>";
+
+                            });
+
+                        });
+
+                        $('#ddlLocation').html(options);
+                    }
+                });
+
+            $.ajax(
+                {
+                    url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/availbility/' + patientId + '/' + doctorId + '',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossDomain: true,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        var options = " <option>SELECT Timeslot</option>";
+
+                        Object.entries(data).forEach(([key, value]) => {
+                            $myBadDates.push(key);
+                        });
+
+                        
+                    }
+                });
+
+
+        }
+        else {
+            getAllDoctors();
+        }
+    }
+
+    function BookNow() {
+        var patientid = $('#PatientId').val();
+        var doctorid = $('#ddlDoctor').find("option:selected").val();
+        var date = $('#txtDate').val();
+        var slot = $('#ddlTimeSlots').find("option:selected").val();
+        var location = $('#ddlLocation').find("option:selected").val();
+
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/booking',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'POST',
+                dataType: 'json',
+                data: JSON.stringify({
+                    "PATIENT_ID": patientid, "DOCTOR_ID": doctorid, "LOCATION_C": location, "APPT_DT": date, "APPT_SLOT": slot
+                }),
+                success: function (data) {
+                    sessionStorage.setItem('generatedToken', data.TOKEN);
+                    var countdownTimer = setInterval(secondPassed, 1000);
+                    $('#ventanamdl').modal('show');
+                    secondPassed();
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+    }
+    
+
+    var seconds = 600; //**change 120 for any number you want, it's the seconds **//
+    function secondPassed() {
+        var minutes = Math.round((seconds - 30) / 60);
+        var remainingSeconds = seconds % 60;
+        if (remainingSeconds < 10) {
+            remainingSeconds = "0" + remainingSeconds;
+        }
+        document.getElementById('countdown').innerHTML = minutes + ":" + remainingSeconds;
+        if (seconds == 0) {
+            clearInterval(countdownTimer);
+            document.getElementById('countdown').innerHTML = "Last chance!";
+            $('#ventanamdl').modal('show');
+        } else {
+            var token = sessionStorage.getItem('generatedToken');
+            if (seconds % 10 == 0) {
+                $.ajax(
+                    {
+                        
+                        url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/booking/' + token,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+
+                        type: 'GET',
+                        dataType: 'json',
+
+                        success: function (data) {
+                            if (data.BOOKING_STATUS == "IN PROGRESS") {
+
+                            }
+                            else {
+                                clearInterval(countdownTimer);
+                                document.getElementById('mytext2').innerHTML = "Your booking has been <span class='text-success'>" + data.BOOKING_STATUS+"</span>!";
+                                $('#ventanamdl').modal('show');
+                            }
+                        }
+                    });
+            }
+
+            seconds--;
+
+
+        }
+    }
+
+    //now your setInterval call is ok
+    
 </script>
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
-    
-<div class="form-horizontal">
-    <h4>Book Appointment</h4>
-    <hr />
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    <div class="form-group">
-        <label class="control-label col-md-2">Patient</label>
+
+    <div class="form-horizontal">
+        <h4>Book Appointment</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            <label class="control-label col-md-2">Patient</label>
             <div class="col-md-10">
-                <input type="text" class = "form-control" id="txtPatientName" />
+                <input type="text" class="form-control" id="txtPatientName" />
+                <input type="hidden" class="form-control" id="PatientId" />
             </div>
         </div>
 
-    <div class="form-group">
-        @*@Html.LabelFor(model => model.PatientId, htmlAttributes: new { @class = "control-label col-md-2" })*@
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.PatientId, new { htmlAttributes = new { @class = "form-control", style = "display:none" } })
-            @*@Html.ValidationMessageFor(model => model.PatientId, "", new { @class = "text-danger" })*@
+        <div class="form-group">
+            @*@Html.LabelFor(model => model.PatientId, htmlAttributes: new { @class = "control-label col-md-2" })*@
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.PatientId, new { htmlAttributes = new { @class = "form-control", style = "display:none" } })
+                @*@Html.ValidationMessageFor(model => model.PatientId, "", new { @class = "text-danger" })*@
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Specialty</label>
+            <div class="col-md-10">
+                <select class="form-control" id="ddlSpecialty" onchange="filterDoctors()">
+                    <option>SELECT Specialty</option>
+                </select>
+
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.DoctorId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="ddlDoctor" onchange="filterLocation()">
+                    <option>SELECT Doctors</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.DoctorId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AppointmentDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.AppointmentDateTime, new { htmlAttributes = new { @class = "form-control", type = "text", onchange = "filterTimeslots()", id = "txtDate"  } })
+            </div>
+            <div class="col-md-4">
+                <select class="form-control" id="ddlTimeSlots">
+                    <option>SELECT Timeslots</option>
+                </select>
+            </div>
+            @Html.ValidationMessageFor(model => model.AppointmentDateTime, "", new { @class = "text-danger col-md-10" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="ddlLocation">
+                    <option>SELECT Location</option>
+                </select>
+
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button type="button" class="btn btn-success" onclick="BookNow()"><i class="glyphicon glyphicon-arrow-right"></i> Book Now</button>
+                <button type="button" class="btn btn-success" onclick="ConfirmBooking('420ec2b5-5445-4957-b5f7-adc06838d114')"><i class="glyphicon glyphicon-arrow-right"></i> Confirm</button>
+
+            </div>
         </div>
     </div>
-    <div class="form-group">
-        <label class = "control-label col-md-2">Specialty</label>
-        <div class="col-md-10">
-            <select class="form-control" id="ddlSpecialty" onchange="filterDoctors()">
-                <option>SELECT Specialty</option>
-            </select>
-            
-        </div>
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(model => model.DoctorId, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            <select class="form-control" id="ddlDoctor">
-                <option>SELECT Doctors</option>
-            </select>
-            @Html.ValidationMessageFor(model => model.DoctorId, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.AppointmentDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
-
-        <div class="col-md-4">
-            @Html.EditorFor(model => model.AppointmentDateTime, new { htmlAttributes = new { @class = "form-control", type = "date" } })
-        </div>
-        <div class="col-md-4">
-            @Html.EditorFor(model => model.AppointmentDateTime, new { htmlAttributes = new { @class = "form-control", type = "time" } })
-        </div>
-        @Html.ValidationMessageFor(model => model.AppointmentDateTime, "", new { @class = "text-danger col-md-10" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
-        </div>
-    </div>
+}
+<div class="modal fade" id="ventanamdl" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1></h1>
+            </div>
+            <div class="modal-body">
+                <h4 class="text-success"><span id="countdown" class="timer"></span></h4>
+                <p class="mytext2">We are confirming your booking! Please wait.  </p>
 
 
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Create" class="btn btn-success" />
+            </div>
+            <div class="modal-footer">
+                
+            </div>
         </div>
     </div>
 </div>
-}
+<!-- Modal end-->
+
+
 
 <div>
     @Html.ActionLink("Back to List", "Index")

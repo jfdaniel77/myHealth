@@ -34,7 +34,7 @@
                             var appointmentStatus = item.STATUS;
 
                             var rows = "<tr>"
-                                + "<td>" + patient + "</td>"
+                                + "<td><button type = 'button' class = 'btn btn-primary' title = 'View Patient Details' onclick = 'ViewPatientDetails(\"" + patient + "\")'><i class='glyphicon glyphicon-info-sign'></i></button> " + patient + " </td>"
                                 + "<td>" + date + " " + appointmentTime + "</td>"
 
 
@@ -79,7 +79,7 @@
                         var year = parseInt(dateparts[2]);
 
                         var full_date = new Date(year + '-' + month + '-' + day);
-                        
+
 
                         var appointmentId = item.ID;
                         var appointmentTime = item.APPT_SLOT;
@@ -116,7 +116,7 @@
                             $('#tblPatientPastAppointments tbody').append(rows);
                         }
 
-                        
+
 
 
                     });
@@ -132,14 +132,14 @@
         //alert(patId);
         $.ajax(
             {
-                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/appointment/patient/' + appId,
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/patient/' + appId,
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 crossDomain: true,
-                type: 'DELETE',
+                method: 'DELETE',
                 dataType: 'json',
-                
+
                 success: function (data) {
 
 
@@ -149,12 +149,38 @@
                 }
             });
     }
+
+    function ViewPatientDetails(patname) {
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/patient?name=' + patname,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+
+                    var obj = data[0];
+                    $('#txtName').val(obj.FULL_NAME);
+                    $('#txtEmail').val(obj.EMAIL);
+                    $('#txtPhone').val(obj.PHONE);
+                    $('#txtAddress').val(obj.ADDRESS);
+                    $('#txtDOB').val(obj.BIRTH_DT);
+
+                    
+                }
+            });
+        $('#patientDetailsModal').modal('show');
+    
+    }
 </script>
 
 <div class="row">
     <div class="col-md-4">
         <h2>Book an Appointment</h2>
-        
+
         <p><a class="btn btn-default" href="/Appointment/Create"><i class="glyphicon glyphicon-bookmark"></i> Book &raquo;</a></p>
     </div>
 
@@ -183,11 +209,10 @@
                     </tr>
                 </thead>
                 <tbody>
-
                 </tbody>
             </table>
         </div>
-        
+
     </div>
     <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
         <div class="tab-content">
@@ -220,6 +245,61 @@
                 <tbody>
                 </tbody>
             </table>
-        </div>    
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="patientDetailsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Patient details</h5>
+
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm())
+                {
+
+                <div class="form-horizontal" style="margin-left:5px;">
+
+
+
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">Patient Name</label>
+                        <div class="col-md-10">
+                            <input type="text" id="txtName" readonly class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">Email</label>
+                        <div class="col-md-10">
+                            <input type="text" id="txtEmail" readonly class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">Address</label>
+                        <div class="col-md-10">
+                            <input type="text" id="txtAddress" readonly class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">Phone</label>
+                        <div class="col-md-10">
+                            <input type="text" id="txtPhone" readonly class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">Date of birth</label>
+                        <div class="col-md-10">
+                            <input type="text" id="txtDOB" readonly class="form-control" />
+                        </div>
+                    </div>
+
+                </div>
+                        }
+
+                    </div>
+
+                </div>
     </div>
 </div>
