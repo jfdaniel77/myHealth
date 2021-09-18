@@ -10,7 +10,7 @@ namespace MvcApplication.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 //string email = ((ClaimsIdentity)User.Identity).FindFirst("nickname").Value;
-                string email = "jdolittle@hotmail.com";
+                string email = "thouston@hotmail.com";
                 Session["email"] = email;
             }
             else
@@ -19,19 +19,9 @@ namespace MvcApplication.Controllers
             }
             return View();
         }
-        public ActionResult Appointment()
-        {
-            ViewBag.Message = "Your application description page.";
+        
 
-            return View();
-        }
-
-        public ActionResult HealthRecords()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
+        
         public ActionResult Medications()
         {
             ViewBag.Message = "Your contact page.";

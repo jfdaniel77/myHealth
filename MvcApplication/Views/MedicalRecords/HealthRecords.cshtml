@@ -1,0 +1,249 @@
+﻿@{
+    ViewBag.Title = "Health Records";
+}
+<h2>@ViewBag.Title.</h2>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var role = sessionStorage.getItem('loginRole');
+        var userId = sessionStorage.getItem('loginUserId');
+        if (role == 'Doctor') {
+            $.ajax(
+                {
+                    url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/doctor/' + userId,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossDomain: true,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#tblDoctorAppointments tbody').empty();
+                        $.each(data, function (i, item) {
+
+                            var appointmentId = item.ID;
+                            var patientId = item.PATIENT_ID;
+
+                            var patient = item.PATIENT_FULLNAME;
+                            var date = item.APPT_DT.replace(/\/Date\((-?\d+)\)\//, '$1');
+                            var date_full = new Date(parseInt(date));
+
+                            var appointmentTime = item.APPT_SLOT;
+                            var locationName = item.LOCATION_NAME;
+                            var locationDetail = item.LOCATION_ADDRESS;
+                            var appointmentStatus = item.STATUS;
+
+                            var rows = "<tr>"
+                                + "<td><button type = 'button' class = 'btn btn-primary' title = 'View Patient Details' onclick = 'ViewPatientDetails(\"" + patient + "\")'><i class='glyphicon glyphicon-info-sign'></i></button> " + patient + " </td>"
+                                + "<td>" + date + " " + appointmentTime + "</td>"
+
+
+                                + "<td>" + locationName + "<br/>" + locationDetail + "</td>"
+                                + "<td>" + appointmentStatus + "</td>"
+                                + "<td><button class = 'btn btn-danger' type = 'button' onclick = 'CancelAppointment(\"" + appointmentId + "\",\"" + patientId + "\")' title = 'Cancel Appointment'><i class='glyphicon glyphicon-remove' ></i></button></td>"
+                                + "</tr>";
+
+                            $('#tblDoctorAppointments tbody').append(rows);
+
+
+                        });
+
+
+                    }
+                });
+
+
+        }
+        else {
+            $('#pills-contact-tab').prop('style', 'display:none');
+        }
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/medrec/' + userId,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#tblMedrec tbody').empty();
+                   
+                    $.each(data, function (i, item) {
+                        var prob = item.PROBLEM;
+                        var diagnosis = item.DIAGNOSIS;
+
+                        var medication = "";
+
+                        item.MEDICATION.forEach(function (obj) {
+                            medication += obj.NAME_T + "(" + obj.QUANTITY + "): " + obj.NOTES;
+                            
+                        });
+
+
+                        var assessment = item.ASSESSMENT;
+                        
+                        var rows = "<tr><td></td>"
+                            + "<td>" + prob + "</td>"
+                            + "<td>" + diagnosis + "</td>"
+
+
+                            + "<td>" + assessment + "</td>"
+                            + "<td>" + medication + "</td>"
+                            + "<td><button type= 'button' class= 'fa fa-edit btn btn-primary' onclick='EditMedRecord(" + item.MEDREC_ID + ")'></button> "
+                            + "<button type= 'button' class= 'fa fa-trash btn btn-danger' onclick='DeleteMedRecord(" + item.PATIENT_ID+"," + item.MEDREC_ID +")'></button>"
+                        +"</td > "
+                            + "</tr>";
+
+                       
+                            $('#tblMedrec tbody').append(rows);
+                        
+
+
+
+
+                    });
+
+
+                }
+            });
+
+    });
+
+    function EditMedRecord(recordId) {
+
+        alert(recordId);
+       
+    }
+    function DeleteMedRecord(patientId, recordId) {
+       
+        $.ajax(
+            {
+
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/medrec/' + patientId + '/' + recordId,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                type: 'DELETE',
+                dataType: 'json',
+                async: false,
+                data: JSON.stringify({
+
+                }),
+                success: function (data) {
+                    alert('The medical record has been removed');
+                    location.reload();
+                }
+            });
+    }
+
+    function ViewPatientDetails(patname) {
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/patient?name=' + patname,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+
+                    var obj = data[0];
+                    $('#txtName').val(obj.FULL_NAME);
+                    $('#txtEmail').val(obj.EMAIL);
+                    $('#txtPhone').val(obj.PHONE);
+                    $('#txtAddress').val(obj.ADDRESS);
+                    $('#txtDOB').val(obj.BIRTH_DT);
+
+
+                }
+            });
+        $('#patientDetailsModal').modal('show');
+
+    }
+</script>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Upload</h2>
+
+        <p><a class="btn btn-default" href="/MedicalRecords/Create"><i class="glyphicon glyphicon-upload"></i> Upload &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Sync</h2>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866"><i class="glyphicon glyphicon-share"></i> Sync with Smart Device &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Search </h2>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867"><i class="glyphicon glyphicon-search"></i> Search &raquo;</a></p>
+    </div>
+</div>
+<div class="row">
+    <h4>My Medical Records</h4>
+
+</div>
+<div class="row">
+    <table class="table table-sm" id="tblMedrec">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Problem</th>
+                <th scope="col">Diagnosis</th>
+                <th scope="col">Assessment</th>
+                <th scope="col">Medications</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+</div>
+<div class="row">
+    <h4>My Vitals</h4>
+
+</div>
+<div class="row">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Synced Date & Time</th>
+                <th scope="col">Blood Pressure</th>
+                <th scope="col">Heart Rate</th>
+                <th scope="col">Oxygen Concentration</th>
+                <th scope="col">Temperature </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>2021 Aug 26 9:43 AM</td>
+                <td>122</td>
+                <td>89</td>
+                <td>123</td>
+                <td>99</td>
+                <td>35</td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>2021 Aug 25 9:48 PM</td>
+                <td>Thornton</td>
+                <td>90</td>
+                <td>93</td>
+                <td>99</td>
+                <td>33</td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td colspan="2">2021 Aug 25 2:13 PM</td>
+                <td>90</td>
+                <td>102</td>
+                <td>99</td>
+                <td>35</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

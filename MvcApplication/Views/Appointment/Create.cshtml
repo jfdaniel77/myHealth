@@ -238,69 +238,121 @@
                 crossDomain: true,
                 type: 'POST',
                 dataType: 'json',
+                async:false,
                 data: JSON.stringify({
                     "PATIENT_ID": patientid, "DOCTOR_ID": doctorid, "LOCATION_C": location, "APPT_DT": date, "APPT_SLOT": slot
                 }),
                 success: function (data) {
                     sessionStorage.setItem('generatedToken', data.TOKEN);
-                    var countdownTimer = setInterval(secondPassed, 1000);
-                    $('#ventanamdl').modal('show');
-                    secondPassed();
+                    $('#btnBook').html('<i class="fa fa-spinner"></i> Booking... Please Wait');
+                    showLoader('Loading, please wait...');
+                    callAPI = true;
+                    do {
+                        $.ajax(
+                            {
+
+                                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/booking/' + data.TOKEN,
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+
+                                type: 'GET',
+                                dataType: 'json',
+                                async: false,
+                                success: function (data2) {
+                                    
+                                    if (data2.BOOKING_STATUS == "IN PROGRESS") {
+
+                                    }
+                                    else {
+                                        bookingstatus = data2.BOOKING_STATUS;
+                                        callAPI = false;
+                                    }
+                                }
+                            });
+                       
+                    }
+                    while (callAPI);
+                    
+                    if (bookingstatus == "BOOKED") {
+                        $('#resultLoading').hide();
+
+                        $('#popUp').modal('show');
+                        $('#bookingToken').text(data.TOKEN);
+                        var countDownDate = new Date().getTime() + 15 * 60000;
+
+                        // Update the count down every 1 second
+                        var x = setInterval(function () {
+
+                            // Get today's date and time
+                            var now = new Date().getTime();
+
+                            // Find the distance between now and the count down date
+                            var distance = countDownDate - now;
+
+                            // Time calculations for days, hours, minutes and seconds
+                            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                            // Output the result in an element with id="demo"
+                            document.getElementById("demo").innerHTML = minutes + "m " + seconds + "s ";
+
+                            // If the count down is over, write some text 
+                            if (distance < 0) {
+                                clearInterval(x);
+                                document.getElementById("demo").innerHTML = "EXPIRED";
+                            }
+                        }, 1000);                     
+                    }
+                    else if (bookingstatus == "REJECTED") {
+                        $('#resultLoading').hide();
+                        alert('the selected slot is not available. please select another timing. ');
+                    }
+                    
                 },
                 error: function (jqXhr, textStatus, errorThrown) {
                     alert(errorThrown);
                 }
             });
     }
-    
 
-    var seconds = 600; //**change 120 for any number you want, it's the seconds **//
-    function secondPassed() {
-        var minutes = Math.round((seconds - 30) / 60);
-        var remainingSeconds = seconds % 60;
-        if (remainingSeconds < 10) {
-            remainingSeconds = "0" + remainingSeconds;
-        }
-        document.getElementById('countdown').innerHTML = minutes + ":" + remainingSeconds;
-        if (seconds == 0) {
-            clearInterval(countdownTimer);
-            document.getElementById('countdown').innerHTML = "Last chance!";
-            $('#ventanamdl').modal('show');
-        } else {
-            var token = sessionStorage.getItem('generatedToken');
-            if (seconds % 10 == 0) {
-                $.ajax(
-                    {
-                        
-                        url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/booking/' + token,
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+    function ConfirmBooking() {
+        var bookingId = $('#bookingToken').text();
+       
+        $.ajax(
+            {
 
-                        type: 'GET',
-                        dataType: 'json',
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/booking/' + bookingId,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
 
-                        success: function (data) {
-                            if (data.BOOKING_STATUS == "IN PROGRESS") {
-
-                            }
-                            else {
-                                clearInterval(countdownTimer);
-                                document.getElementById('mytext2').innerHTML = "Your booking has been <span class='text-success'>" + data.BOOKING_STATUS+"</span>!";
-                                $('#ventanamdl').modal('show');
-                            }
-                        }
-                    });
-            }
-
-            seconds--;
-
-
-        }
+                type: 'PUT',
+                dataType: 'json',
+                async: false, 
+                data: JSON.stringify({
+                    
+                }),
+                success: function (data2) {
+                    if (data2.BOOKING_STATUS == "CONFIRMED") {
+                        alert('Your appointment has been confirmed. Thank you! See you soon');
+                        $('#popUp').modal('hide');
+                    }
+                    
+                }
+            });
     }
+    
+    var showLoader = function (text) {
+        $('#resultLoading').show();
+        $('#resultLoading').find('.loader-text').html(text);
+    };
+
 
     //now your setInterval call is ok
-    
+   
 </script>
 
 @using (Html.BeginForm())
@@ -371,22 +423,24 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <button type="button" class="btn btn-success" onclick="BookNow()"><i class="glyphicon glyphicon-arrow-right"></i> Book Now</button>
-                <button type="button" class="btn btn-success" onclick="ConfirmBooking('420ec2b5-5445-4957-b5f7-adc06838d114')"><i class="glyphicon glyphicon-arrow-right"></i> Confirm</button>
+                <button type="button" class="btn btn-success" onclick="BookNow()" id="btnBook"><i class="fa fa-stethoscope"></i> Book Now</button>
 
             </div>
         </div>
     </div>
 }
-<div class="modal fade" id="ventanamdl" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="popUp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h1></h1>
             </div>
             <div class="modal-body">
-                <h4 class="text-success"><span id="countdown" class="timer"></span></h4>
-                <p class="mytext2">We are confirming your booking! Please wait.  </p>
+                <h4 class="text-success"><span id="demo" class="timer"></span></h4>
+                <p id="mytext2">We have booked your selected slot. Please confirm your booking details before expiry. </p>
+                <label id="bookingToken"></label>
+
+                <button type="button" class="btn btn-success" onclick="ConfirmBooking()"><i class="glyphicon glyphicon-check"></i> Confirm</button>
 
 
             </div>
@@ -398,10 +452,18 @@
 </div>
 <!-- Modal end-->
 
-
+<div id="resultLoading" style="display: none; width: 100%; height: 100%; position: fixed; z-index: 10000; top: 0px; left: 0px; right: 0px; bottom: 0px; margin: auto;">
+    <div style="width: 340px; height: 200px; text-align: center; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; margin: auto; z-index: 10; color: rgb(255, 255, 255);">
+        <div class="uil-default-css">
+            <img src="/images/loading-animation1.gif" style="max-width: 150px; max-height: 150px; display: block; margin-left: auto; margin-right: auto;" />
+        </div>
+        <div class="loader-text" style="display: block; font-size: 18px; font-weight: 300;">&nbsp;</div>
+    </div>
+    <div style="background: rgb(0, 0, 0); opacity: 0.6; width: 100%; height: 100%; position: absolute; top: 0px;"></div>
+</div>
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Back to List", "Appointment")
 </div>
 
 @section Scripts {

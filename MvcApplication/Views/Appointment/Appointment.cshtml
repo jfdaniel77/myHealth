@@ -128,24 +128,25 @@
     });
 
     function CancelAppointment(appId, patId) {
-        //alert(appId);
-        //alert(patId);
+       
+
         $.ajax(
             {
-                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/patient/' + appId,
+
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/patient/' + patId+'/'+appId,
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                crossDomain: true,
-                method: 'DELETE',
+
+                type: 'DELETE',
                 dataType: 'json',
+                async: false,
+                data: JSON.stringify({
 
+                }),
                 success: function (data) {
-
-
-
-
-                    alert(data);
+                    alert('The appointment has been cancelled');
+                    location.reload();
                 }
             });
     }
@@ -189,9 +190,9 @@
     <li class="nav-item">
         <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Upcoming Appointments</a>
     </li>
-    <li class="nav-item">
+    @*<li class="nav-item">
         <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Past Appointments</a>
-    </li>
+    </li>*@
     <li class="nav-item">
         <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Consultations Booked</a>
     </li>
@@ -214,7 +215,7 @@
         </div>
 
     </div>
-    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+    @*<div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
         <div class="tab-content">
             <table class="table table-responsive" id="tblPatientPastAppointments">
                 <thead>
@@ -229,7 +230,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </div>*@
     <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
         <div class="tab-content">
             <table class="table table-responsive" id="tblDoctorAppointments">

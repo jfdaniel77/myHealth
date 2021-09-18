@@ -31,8 +31,8 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Dashboard", "Home")</li>
                     @*<li>@Html.ActionLink("Tokens", "Tokens", "Account")</li>*@
-                    <li>@Html.ActionLink("Appointments", "Appointment", "Home")</li>
-                    <li>@Html.ActionLink("Health Records", "HealthRecords", "Home")</li>
+                    <li>@Html.ActionLink("Appointments", "Appointment", "Appointment")</li>
+                    <li>@Html.ActionLink("Health Records", "HealthRecords", "MedicalRecords")</li>
                     <li>@Html.ActionLink("Medications", "Medications", "Home")</li>
                     <li>@Html.ActionLink("Notifications", "Notifications", "Home")</li>
                     
@@ -75,7 +75,7 @@
         @Html.Partial("_GiveFeedback")
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year - My Health web Application</p>
         </footer>
     </div>
 

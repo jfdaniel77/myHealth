@@ -70,42 +70,30 @@
     function Rate() {
         $('#btnRate').html('<i class="glyphicon glyphicon-refresh"></i> Sending Feedback.......');
         alert('test the change');
+        
+        var userid = 1001495;
+
         $.ajax(
             {
-                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/feedback/1001495',
+
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/feedback/' + userid,
                 headers: {
-                    "Content-Type": "application/json"
+                    'Content-Type': 'application/json'
                 },
-                
+
                 type: 'POST',
                 dataType: 'json',
-                crossDomain: true,
-                format:"json",
-                data: {
+                async: false,
+                data: JSON.stringify({
                     "MESSAGE_T": "Hello World",
                     "RATING": "4",
-                },
-                success: function (data) {
-                    alert('called');
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    alert(errorThrown);
+                }),
+                success: function (data2) {
+                    alert('feedback success is called');
+
                 }
-                
             });
-        //const response = await axios({
-        //    method: "post",
-        //    url: `https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/feedback/1000685`,
-        //    headers: {
-        //        "Content-Type": "application/json",
-        //    },
-        //    data: {
-        //        MESSAGE_T: "Usefull Application and I like the UI. Hello World",
-        //        RATING: "5",
-        //    },
-        //}).then((response) => {
-        //    console.log(response);
-        //});
+        
     
         $('#btnRate').html('<i class="glyphicon glyphicon-pencil"></i> Send Feedback');
     }

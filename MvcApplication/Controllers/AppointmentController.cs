@@ -17,5 +17,11 @@ namespace MvcApplication.Controllers
         {
             return View();
         }
+        public ActionResult Appointment()
+        {
+            ViewBag.Message = "Your application description page.";
+
+            return View();
+        }
     }
 }
