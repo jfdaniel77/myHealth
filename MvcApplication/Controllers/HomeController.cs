@@ -1,5 +1,5 @@
 ﻿using System.Web.Mvc;
-
+using System.Security.Claims;
 namespace MvcApplication.Controllers
 {
     public class HomeController : Controller
