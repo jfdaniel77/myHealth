@@ -97,7 +97,7 @@
                     dataType: 'json',
 
                     data: JSON.stringify({
-                        "PATIENT_ID": patientid, "PROBLEM": problem, "DIAGNOSIS": diagnosis, "ASSESSMENT": assessment, "CREATED_BY": userid
+                        "PATIENT_ID": userid, "PROBLEM": problem, "DIAGNOSIS": diagnosis, "ASSESSMENT": assessment, "CREATED_BY": userid
                     }),
                     success: function (data) {
                         alert('saved');

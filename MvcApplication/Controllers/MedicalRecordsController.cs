@@ -16,11 +16,7 @@ namespace MvcApplication.Controllers
             return View();
         }
 
-        // GET: MedicalRecords/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+
 
         // GET: MedicalRecords/Create
         public ActionResult Create()
@@ -28,21 +24,6 @@ namespace MvcApplication.Controllers
             return View();
         }
 
-        // POST: MedicalRecords/Create
-        [HttpPost]
-        public ActionResult Create(FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         // GET: MedicalRecords/Edit/5
         public ActionResult Patients()
