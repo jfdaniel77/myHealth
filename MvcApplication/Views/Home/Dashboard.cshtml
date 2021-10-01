@@ -27,6 +27,46 @@
                 else {
                     sessionStorage.setItem('loginRole', 'Patient');
                 }
+
+                $.ajax(
+                    {
+                        url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/recommendation/' + data.USER_ID,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        crossDomain: true,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (alerts) {
+                            $('#tblalerts tbody').empty();
+                            $.each(alerts, function (i, item) {
+
+                                var messagetopic = item.MSG_TP_T;
+                                var message = item.MESSAGE_T;
+
+                                var icon;
+                                if (messagetopic == 'VITAL_SIGN') {
+                                    icon = '<i class = "fa fa-heartbeat"></i>';
+                                }
+                                else if (messagetopic == 'MEDICAL_RECORD') {
+                                    icon = '<i class = "fa fa-medkit"></i>';
+                                }
+                                else {
+                                    icon = '<i class="glyphicon glyphicon-bell"></i>';
+                                }
+                                
+
+                                var rows = "<tr>"
+                                    + "<td>" + icon + "</td>"
+                                    + "<td>" + message + "</td>"
+                                    + "</tr>";
+
+                                $('#tblalerts tbody').append(rows);
+
+
+                            });
+                        }
+                    });
             }
         });
 
@@ -59,25 +99,19 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
         <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
     </div>
-    <table class="table">
+    <table class="table" id="tblalerts">
         <thead>
             <tr>
                 <th>
-                    Claim
+                    
                 </th>
                 <th>
-                    Value
+                    
                 </th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var claim in ((ClaimsIdentity)User.Identity).Claims)
-            {
-                <tr>
-                    <td>@claim.Type</td>
-                    <td>@claim.Value</td>
-                </tr>
-}
+            
         </tbody>
     </table>
 </div>

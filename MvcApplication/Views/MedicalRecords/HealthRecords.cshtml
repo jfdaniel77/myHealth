@@ -110,11 +110,7 @@
 
     });
 
-    function EditMedRecord(recordId) {
-
-        alert(recordId);
-       
-    }
+    
     function DeleteMedRecord(patientId, recordId) {
        
         $.ajax(
@@ -138,30 +134,35 @@
             });
     }
 
-    function ViewPatientDetails(patname) {
+    function addVitals() {
+        var userId = sessionStorage.getItem('loginUserId');
         $.ajax(
             {
-                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/patient?name=' + patname,
+
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/vitalsign/' + userId ,
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                crossDomain: true,
-                type: 'GET',
+
+                type: 'POST',
                 dataType: 'json',
+                async: false,
+                data: JSON.stringify({
+                    "BP": "120/90",
+                    "BT": "36.5",
+                    "HR": "100",
+                    "RR": "20",
+                    "OS": "98",
+                    "BW": "70",
+                    "BH": "167",
+                    "datetime": "1630989116583"
+
+                }),
                 success: function (data) {
-
-                    var obj = data[0];
-                    $('#txtName').val(obj.FULL_NAME);
-                    $('#txtEmail').val(obj.EMAIL);
-                    $('#txtPhone').val(obj.PHONE);
-                    $('#txtAddress').val(obj.ADDRESS);
-                    $('#txtDOB').val(obj.BIRTH_DT);
-
-
+                    alert('The vital record has been added');
+                    location.reload();
                 }
             });
-        $('#patientDetailsModal').modal('show');
-
     }
 </script>
 
@@ -176,8 +177,8 @@
         <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866"><i class="glyphicon glyphicon-share"></i> Sync with Smart Device &raquo;</a></p>
     </div>
     <div class="col-md-4">
-        <h2>Search </h2>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867"><i class="glyphicon glyphicon-search"></i> Search &raquo;</a></p>
+        <h2>Search Patients</h2>
+        <p><a class="btn btn-default" href="/MedicalRecords/Patients"><i class="glyphicon glyphicon-search"></i> Search &raquo;</a></p>
     </div>
 </div>
 <div class="row">
@@ -198,52 +199,6 @@
         </thead>
         <tbody>
             
-        </tbody>
-    </table>
-</div>
-<div class="row">
-    <h4>My Vitals</h4>
-
-</div>
-<div class="row">
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Synced Date & Time</th>
-                <th scope="col">Blood Pressure</th>
-                <th scope="col">Heart Rate</th>
-                <th scope="col">Oxygen Concentration</th>
-                <th scope="col">Temperature </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>2021 Aug 26 9:43 AM</td>
-                <td>122</td>
-                <td>89</td>
-                <td>123</td>
-                <td>99</td>
-                <td>35</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>2021 Aug 25 9:48 PM</td>
-                <td>Thornton</td>
-                <td>90</td>
-                <td>93</td>
-                <td>99</td>
-                <td>33</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td colspan="2">2021 Aug 25 2:13 PM</td>
-                <td>90</td>
-                <td>102</td>
-                <td>99</td>
-                <td>35</td>
-            </tr>
         </tbody>
     </table>
 </div>

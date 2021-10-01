@@ -48,6 +48,7 @@
                 crossDomain: true,
                 type: 'GET',
                 dataType: 'json',
+                async:false,
                 success: function (data) {
                     var options = " <option>SELECT Specialty</option>";
 
@@ -59,6 +60,19 @@
                     $('#ddlSpecialty').html(options);
                 }
             });
+
+        var selectedDoctor = sessionStorage.getItem('selectedDoctorId');
+        if (selectedDoctor != null) {
+            var selectedDate = sessionStorage.getItem('seletedDate');
+            var selectedLocation = sessionStorage.getItem('selectedLocation');
+            var selectedSpecilaty = sessionStorage.getItem('selectedSpecialty');
+            $('#ddlSpecialty option:contains("' + selectedSpecilaty + '")').prop("selected", true);
+            filterDoctors();
+            $('#ddlDoctor option:contains("' + selectedDoctor + '")').prop("selected", true);
+            filterLocation();
+            $('#txtDate').val(selectedDate);
+            filterTimeslots();
+        }
     })
 
     function checkBadDates(mydate) {
@@ -228,7 +242,8 @@
         var date = $('#txtDate').val();
         var slot = $('#ddlTimeSlots').find("option:selected").val();
         var location = $('#ddlLocation').find("option:selected").val();
-
+        var speciality = $('#ddlSpecialty').find("option:selected").text();
+        
         $.ajax(
             {
                 url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/booking',
@@ -245,9 +260,11 @@
                 success: function (data) {
                     sessionStorage.setItem('generatedToken', data.TOKEN);
                     $('#btnBook').html('<i class="fa fa-spinner"></i> Booking... Please Wait');
-                    showLoader('Loading, please wait...');
+                    //showLoader('Loading, please wait...');
                     callAPI = true;
                     do {
+                        var currentTimestamp = new Date().getTime();
+                        if (currentTimestamp % 5000 == 0) {
                         $.ajax(
                             {
 
@@ -270,10 +287,13 @@
                                     }
                                 }
                             });
+
+                        }
+
                        
                     }
                     while (callAPI);
-                    
+                    $('#btnBook').html('<i class="fa fa-stethoscope"></i> Book Now');
                     if (bookingstatus == "BOOKED") {
                         $('#resultLoading').hide();
 
@@ -309,6 +329,11 @@
                     else if (bookingstatus == "REJECTED") {
                         $('#resultLoading').hide();
                         alert('the selected slot is not available. please select another timing. ');
+                        sessionStorage.setItem('selectedDoctorId', doctorid);
+                        sessionStorage.setItem('seletedDate', date);
+                        sessionStorage.setItem('selectedLocation', location);
+                        sessionStorage.setItem('selectedSpecialty', speciality);
+                        window.location.reload();
                     }
                     
                 },
@@ -343,6 +368,8 @@
                     
                 }
             });
+
+            $('#btnBook').html('<i class="fa fa-stethoscope"></i> Book Now');
     }
     
     var showLoader = function (text) {

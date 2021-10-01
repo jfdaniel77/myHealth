@@ -9,8 +9,8 @@ namespace MvcApplication.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                //string email = ((ClaimsIdentity)User.Identity).FindFirst("nickname").Value;
-                string email = "thouston@hotmail.com";
+                string email = ((ClaimsIdentity)User.Identity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress").Value;
+               // string email = "thouston@hotmail.com";
                 Session["email"] = email;
             }
             else

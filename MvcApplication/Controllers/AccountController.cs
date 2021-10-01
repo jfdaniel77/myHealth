@@ -27,21 +27,6 @@ namespace MvcApplication.Controllers
             HttpContext.GetOwinContext().Authentication.SignOut("Auth0");
         }
 
-        [Authorize]
-        public ActionResult Tokens()
-        {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-
-            ViewBag.AccessToken = claimsIdentity?.FindFirst(c => c.Type == "access_token")?.Value;
-            ViewBag.IdToken = claimsIdentity?.FindFirst(c => c.Type == "id_token")?.Value;
-            ViewBag.Email = claimsIdentity?.FindFirst(c => c.Type == "email")?.Value;
-            return View();
-        }
-
-        [Authorize]
-        public ActionResult Claims()
-        {
-            return View();
-        }
+       
     }
 }

@@ -54,7 +54,7 @@ namespace MvcApplication
                 PostLogoutRedirectUri = auth0PostLogoutRedirectUri,
 
                 ResponseType = OpenIdConnectResponseType.CodeIdTokenToken,
-                Scope = "openid profile",
+                Scope = "openid profile email",
 
                 TokenValidationParameters = new TokenValidationParameters
                 {

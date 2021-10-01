@@ -1,0 +1,300 @@
+@{
+    ViewBag.Title = "Health Records";
+}
+<h2>@ViewBag.Title.</h2>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var role = sessionStorage.getItem('loginRole');
+        var userId = sessionStorage.getItem('loginUserId');
+
+    });
+
+    function AddMedicalRecord(patientId, patientName) {
+
+        $('#PatientId').val(patientId);
+        $('#PatientName').val(patientName);
+        $('#editModal').modal('show');
+
+
+    }
+
+    function SaveMedicalRecords() {
+        var userid = sessionStorage.getItem('loginUserId');
+        var role = sessionStorage.getItem('loginRole');
+        var problem = $('#txtProblem').val();
+        var patientid = $('#PatientId').val();
+        if (role == 'Doctor') {
+            var diagnosis = $('#txtDiagnosis').val();
+            var assessment = $('#txtAssessment').val();
+            $.ajax(
+                {
+                    url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/medrec',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossDomain: true,
+                    type: 'POST',
+                    dataType: 'json',
+
+                    data: JSON.stringify({
+                        "PATIENT_ID": patientid, "PROBLEM": problem, "DIAGNOSIS": diagnosis, "ASSESSMENT": assessment, "CREATED_BY": userid
+                    }),
+                    success: function (data) {
+                        alert('saved');
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+        }
+
+
+    }
+
+
+    function DeleteMedRecord(patientId, recordId) {
+
+        $.ajax(
+            {
+
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/medrec/' + patientId + '/' + recordId,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                type: 'DELETE',
+                dataType: 'json',
+                async: false,
+                data: JSON.stringify({
+
+                }),
+                success: function (data) {
+                    alert('The medical record has been removed');
+                    location.reload();
+                }
+            });
+    }
+    function SearchPatient() {
+        var searchKeyword = $('#txtPatientName').val();
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/patient?name=' + searchKeyword,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#tblAllUsers tbody').empty();
+                    $.each(data, function (i, item) {
+
+                        var userid = item.USER_ID;
+                        var patientname = item.FULL_NAME;
+                        var email = item.EMAIL;
+                        var phone = item.PHONE;
+
+
+                        var rows = "<tr>"
+                            + "<td></td>"
+                            + "<td>" + patientname + "</td>"
+                            + "<td>" + email + "</td>"
+
+
+                            + "<td>" + phone + "</td>"
+
+                            + "<td><button class = 'btn btn-primary' type = 'button' onclick = 'AddMedicalRecord(\"" + userid + "\",\"" + patientname + "\")' title = 'Edit Medical Record'><i class='glyphicon glyphicon-pencil' ></i></button> "
+                            + " <button class = 'btn btn-primary' type = 'button' onclick = 'ViewMedicalRecord(\"" + userid + "\",\"" + patientname + "\")' title = 'View Medical Record'><i class='glyphicon glyphicon-file' ></i></button></td>"
+                            + "</tr>";
+
+                        $('#tblAllUsers tbody').append(rows);
+
+
+                    });
+
+
+                }
+            });
+    }
+
+    function ViewMedicalRecord(patientId, patientName) {
+
+        $('#PatientId').val(patientId);
+        $('#PatientName').val(patientName);
+        $('#viewModal').modal('show');
+
+        
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/medrec/' + patientId,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#tblPatientHealthRecords tbody').empty();
+                    $.each(data, function (i, item) {
+                        var prob = item.PROBLEM;
+                        var diagnosis = item.DIAGNOSIS;
+
+                        var medication = "";
+
+                        item.MEDICATION.forEach(function (obj) {
+                            medication += obj.NAME_T + "(" + obj.QUANTITY + "): " + obj.NOTES;
+
+                        });
+
+
+                        var assessment = item.ASSESSMENT;
+
+                        var rows = "<tr><td></td>"
+                            + "<td>" + prob + "</td>"
+                            + "<td>" + diagnosis + "</td>"
+
+
+                            + "<td>" + assessment + "</td>"
+                            + "<td>" + medication + "</td>"
+                            + "</tr>";
+
+
+                        $('#tblPatientHealthRecords tbody').append(rows);
+
+
+
+
+
+                    });
+
+
+                }
+            });
+    }
+
+</script>
+
+
+<div class="row">
+    <h4>All Medical Records</h4>
+
+</div>
+<div class="row">
+    <div class="input-group">
+        <input type="text" class="input-group-text" id="txtPatientName" placeholder="Search Patient's Name..." />
+        <button type="button" class="btn btn-primary" onclick="SearchPatient()"><i class="fa fa-search"></i></button>
+    </div>
+
+</div>
+
+<div class="row">
+    <table class="table table-sm" id="tblAllUsers">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<div id="editModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Medical Record</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Patient</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" id="PatientName" readonly />
+                            <input type="hidden" class="form-control" id="PatientId" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Problem</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" id="txtProblem" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="diagnosis">
+                        <label class="control-label col-md-2">Diagnosis</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" id="txtDiagnosis" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="assessment">
+                        <label class="control-label col-md-2">Assessment</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" id="txtAssessment" rows="3"></textarea>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <button class="btn btn-success" onclick="SaveMedicalRecords()" type="button"><i class="fa fa-save"></i> Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="viewModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Medical Records</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <table class="table table-sm" id="tblPatientHealthRecords">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Problem</th>
+                                <th scope="col">Diagnosis</th>
+                                <th scope="col">Assessment</th>
+                                <th scope="col">Medications</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                
+            </div>
+        </div>
+
+    </div>
+</div>

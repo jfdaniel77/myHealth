@@ -69,10 +69,11 @@
 
     function Rate() {
         $('#btnRate').html('<i class="glyphicon glyphicon-refresh"></i> Sending Feedback.......');
-        alert('test the change');
+       
         
-        var userid = 1001495;
-
+        var userid = sessionStorage.getItem('loginUserId');
+        var comments = $('#txtMessage').val();
+        var rating = $(".myratings").text();
         $.ajax(
             {
 
@@ -85,17 +86,18 @@
                 dataType: 'json',
                 async: false,
                 data: JSON.stringify({
-                    "MESSAGE_T": "Hello World",
-                    "RATING": "4",
+                    "MESSAGE_T": comments,
+                    "RATING": rating,
                 }),
                 success: function (data2) {
-                    alert('feedback success is called');
+                    alert('Thank you for your feedback!');
 
                 }
             });
         
     
         $('#btnRate').html('<i class="glyphicon glyphicon-pencil"></i> Send Feedback');
+        $('#exampleModal').modal('hide');
     }
 </script>
 
@@ -134,7 +136,8 @@
                         <div class="form-group">
                             @Html.LabelFor(model => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
                             <div class="col-md-10">
-                                @Html.TextAreaFor(model => model.Message, new { htmlAttributes = new { @class = "form-control "} })
+                                <textarea class="form-control" id="txtMessage" rows="3"></textarea>
+                                
                                 @Html.ValidationMessageFor(model => model.Message, "", new { @class = "text-danger" })
                             </div>
                         </div>

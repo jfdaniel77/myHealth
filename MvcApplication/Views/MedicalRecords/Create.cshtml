@@ -8,6 +8,15 @@
         $('#txtPatientName').val(sessionStorage.getItem('loginUserName'));
         $('#txtPatientName').prop('disabled', true);
         
+        var role = sessionStorage.getItem('loginRole');
+        if (role !== 'Doctor') {
+            $('#diagnosis').prop('style', 'display:none');
+            $('#assessment').prop('style', 'display:none');
+        }
+        else {
+            $('#diagnosis').prop('style', '');
+            $('#assessment').prop('style', '');
+        }
 
 
     })
@@ -70,61 +79,60 @@
    
 
     function SaveMedicalRecords() {
-        var patientid = $('#PatientId').val();
-        
+        var userid = sessionStorage.getItem('loginUserId');
+        var role = sessionStorage.getItem('loginRole');
         var problem = $('#txtProblem').val();
-        var diagnosis = $('#txtDiagnosis').val();
-        var assessment = $('#txtAssessment').val();
+        
+        if (role == 'Doctor') {
+            var diagnosis = $('#txtDiagnosis').val();
+            var assessment = $('#txtAssessment').val();
+            $.ajax(
+                {
+                    url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/medrec',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossDomain: true,
+                    type: 'POST',
+                    dataType: 'json',
 
-        $.ajax(
-            {
-                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/medrec',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                crossDomain: true,
-                type: 'POST',
-                dataType: 'json',
-                
-                data: JSON.stringify({
-                    "PATIENT_ID": patientid, "PROBLEM": problem, "DIAGNOSIS": diagnosis, "ASSESSMENT": assessment
-                }),
-                success: function (data) {
-                    alert('saved');
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    alert(errorThrown);
-                }
-            });
-    }
-
-    function ConfirmBooking() {
-        var bookingId = $('#bookingToken').text();
-
-        $.ajax(
-            {
-
-                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/booking/' + bookingId,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-
-                type: 'PUT',
-                dataType: 'json',
-                async: false,
-                data: JSON.stringify({
-
-                }),
-                success: function (data2) {
-                    if (data2.BOOKING_STATUS == "CONFIRMED") {
-                        alert('Your appointment has been confirmed. Thank you! See you soon');
-                        $('#popUp').modal('hide');
+                    data: JSON.stringify({
+                        "PATIENT_ID": patientid, "PROBLEM": problem, "DIAGNOSIS": diagnosis, "ASSESSMENT": assessment, "CREATED_BY": userid
+                    }),
+                    success: function (data) {
+                        alert('saved');
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        alert(errorThrown);
                     }
+                });
+        }
+        else {
+            $.ajax(
+                {
+                    url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/medrec',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossDomain: true,
+                    type: 'POST',
+                    dataType: 'json',
 
-                }
-            });
+                    data: JSON.stringify({
+                        "PATIENT_ID": userid, "PROBLEM": problem, "CREATED_BY": userid
+                    }),
+                    success: function (data) {
+                        alert('Your medical record is saved');
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+        }
+        
     }
 
+    
 
 
     //now your setInterval call is ok
@@ -156,14 +164,14 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="diagnosis">
             @Html.LabelFor(model => model.Diagnosis, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <textarea class="form-control" id="txtDiagnosis" rows="3"></textarea>
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="assessment">
             @Html.LabelFor(model => model.Assessment, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <textarea class="form-control" id="txtAssessment" rows="3"></textarea>

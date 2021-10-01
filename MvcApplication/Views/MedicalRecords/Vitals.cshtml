@@ -1,0 +1,542 @@
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var hrStandard = [];
+        hrStandard.push({
+            "age": 20,
+            "low": 120,
+            "high": 170
+        },{
+                "age": 25,
+                "low": 117,
+                "high": 166
+            },{
+                "age": 30,
+                "low": 114,
+                "high": 162
+            },
+            {
+            "age": 35,
+            "low": 111,
+            "high": 157
+            },
+            {
+            "age": 40,
+            "low": 108,
+            "high": 153
+            }, {
+            "age": 45,
+            "low": 105,
+            "high": 149
+        }, {
+            "age": 50,
+            "low": 102,
+            "high": 145
+        },{
+            "age": 55,
+            "low": 99,
+            "high": 140
+        },{
+            "age": 60,
+            "low": 96,
+            "high": 136
+        }, {
+            "age": 65,
+            "low": 93,
+            "high": 132
+        }, {
+            "age": 70,
+            "low": 90,
+            "high": 123
+        });
+
+        
+
+        var userId = sessionStorage.getItem('loginUserId');
+        var userEmail = sessionStorage.getItem('loginEmail');
+
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var y = today.getFullYear();
+        var myFormattedToday = dd + '/' + mm + '/' + y;
+
+
+        var myDate = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000));
+        var dd = myDate.getDate();
+        var mm = myDate.getMonth() + 1;
+        var y = myDate.getFullYear();
+        var myFormattedDate = dd + '/' + mm + '/' + y;
+
+
+        var HRarray = [];
+        var hrbaselinelow = [];
+        var hrbaselinehigh = [];
+
+        var RRarray = [];
+        var rrbase = [];
+        var rrtop = [];
+
+        var OSarray = [];
+        var osbaseline = [];
+
+        var underweight = [];
+        var normal = [];
+        var overweight = [];
+
+
+        var BMIarray = [];
+
+        var btbaseline = [];
+        var BTarray = [];
+
+        var hpbbaseline = [];
+        var lpbbaseline = [];
+        var HBParray = [];
+        var LBParray = [];
+
+        var standardhrlow; var standardhrhigh;
+        var dob; var age;
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/user/' + userEmail,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                async:false,
+                success: function (data) {
+
+
+                    dob = new Date(data.BIRTH_DT);
+                    age = new Date().getFullYear() - dob.getFullYear();
+
+                }
+            });
+
+        hrStandard.forEach(function (obj) {
+            if (age > obj.age) {
+                standardhrhigh = parseInt(obj.high);
+                standardhrlow = parseInt(obj.low);
+            }
+        });
+       
+        
+        $.ajax(
+            {
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/vitalsign/record/' + userId + '?start=' + myFormattedDate + '&end=' + myFormattedToday,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                crossDomain: true,
+                type: 'GET',
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    data.forEach(function (obj) {
+
+                        var date_ob = new Date(obj.datetime);
+
+
+
+                        var hr = obj.HR;
+                        var hrobj = { "x": date_ob, "y": hr };
+                        HRarray.push(hrobj);
+                        hrbaselinelow.push({ "x": date_ob, "y": standardhrlow });
+                        hrbaselinehigh.push({ "x": date_ob, "y": standardhrhigh });
+
+                        var rr = obj.RR;
+                        var rrobj = { "x": date_ob, "y": rr };
+                        RRarray.push(rrobj);
+                        rrbase.push({ "x": date_ob, "y": 12 });
+                        rrtop.push({ "x": date_ob, "y": 20 });
+
+                        var os = obj.OS;
+                        var osobj = { "x": date_ob, "y": os }
+                        OSarray.push(osobj);
+                        osbaseline.push({ "x": date_ob, "y": 95 });
+
+                        var bw = obj.BW;
+                        var bh = obj.BH / 100;
+                        var bmi = bw / bh * bh;
+                        var bmiobj = { "x": date_ob, "y": bmi }
+                        BMIarray.push(bmiobj);
+                        underweight.push({ "x": date_ob, "y": 18.5 });
+                        normal.push({ "x": date_ob, "y": 25 });
+                        overweight.push({ "x": date_ob, "y": 30 });
+
+                        var bt = obj.BT;
+                        var btobj = { "x": date_ob, "y": bt };
+                        BTarray.push(btobj);
+                        btbaseline.push({ "x": date_ob, "y": 37.5 });
+
+                        var bp = obj.BP;
+                        var bpdata = bp.split('/');
+                        var hbp = parseInt(bpdata[0]);
+                        var lbp = parseInt(bpdata[1]);
+
+
+                        var hpbobj = { "x": date_ob, "y": hbp };
+                        HBParray.push(hpbobj);
+                        hpbbaseline.push({ "x": date_ob, "y": 120 });
+
+
+                        var lbpobj = { "x": date_ob, "y": lbp };
+                        LBParray.push(lbpobj);
+                        lpbbaseline.push({ "x": date_ob, "y": 80 });
+                    });
+                }
+
+
+
+            });
+
+        var bpchart = new CanvasJS.Chart("BPChartContainer", {
+            theme: "light2",
+            zoomEnabled: true,
+            animationEnabled: true,
+            title: {
+                text: "My Blood Pressure (" + myFormattedDate + " - " + myFormattedToday + ")"
+            },
+            subtitles: [
+                {
+                    text: ""
+                }
+            ],
+            data: [{
+                type: 'line',
+                showInLegend: true,
+                name: 'Standard Diastolic Blood Pressure',
+                markerType: "square",
+                xValuleFormatString: "DD-MM-YY hh:mm TT",
+                color: "#660066",
+                yValueFormatString: "#,##0K",
+                dataPoints: lpbbaseline
+
+            }, {
+                type: 'line',
+                showInLegend: true,
+                name: 'Standard Systolic Blood Pressure',
+                markerType: "square",
+                xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#FF0000",
+                yValueFormatString: "#,##0K",
+                dataPoints: hpbbaseline
+
+            },
+            {
+                type: "line",
+                showInLegend: true,
+                name: "High Blood Pressure",
+                markerType: "square",
+                xValuleFormatString: "DD-MM-YY hh:mm TT",
+                color: "#FF3399",
+                yValueFormatString: "#,##0K",
+                dataPoints: HBParray
+            },
+            {
+                type: "line",
+                showInLegend: true,
+                name: "Low Blood Pressure",
+                markerType: "square",
+                xValuleFormatString: "DD-MM-YY hh:mm TT",
+                color: "#33FFFF",
+                yValueFormatString: "#,##0K",
+                dataPoints: LBParray
+            }]
+        });
+        bpchart.render();
+
+        var btchart = new CanvasJS.Chart("bodyTempChartContainer", {
+            theme: "light2",
+            zoomEnabled: true,
+            animationEnabled: true,
+            title: {
+                text: "My Body Temperature (" + myFormattedDate + " - " + myFormattedToday + ")"
+            },
+            subtitles: [
+                {
+                    text: ""
+                }
+            ],
+            data: [{
+                type: 'line',
+                showInLegend: true,
+                name: 'Standard Body Temperature',
+                markerType: "square",
+                xValuleFormatString: "DD-MM-YY hh:mm TT",
+                color: "#00811F",
+                yValueFormatString: "#,##0K",
+                dataPoints: btbaseline
+
+            },
+
+            {
+                type: "line",
+                showInLegend: true,
+                name: "Body Temperature",
+                markerType: "square",
+                xValuleFormatString: "DD-MM-YY hh:mm TT",
+                color: "#FF3399",
+                yValueFormatString: "#,##0K",
+                dataPoints: BTarray
+            }]
+        });
+        btchart.render();
+
+        var bmichart = new CanvasJS.Chart("BmiChartContainer", {
+            theme: "light2",
+            zoomEnabled: true,
+            animationEnabled: true,
+            title: {
+                text: "My BMI (" + myFormattedDate + " - " + myFormattedToday + ")"
+            },
+            subtitles: [
+                {
+                    text: ""
+                }
+            ],
+            data: [
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'Overweight',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#660066",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: overweight
+
+                },
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'Underweight',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#FFFF00",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: underweight
+
+                },
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'Normal BMI',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#00811F",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: normal
+
+                },
+
+                {
+                    type: "line",
+                    showInLegend: true,
+                    name: "My BMI",
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#FF3399",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: BMIarray
+                }]
+        });
+        bmichart.render();
+
+        var rrchart = new CanvasJS.Chart("RRChartContainer", {
+            theme: "light2",
+            zoomEnabled: true,
+            animationEnabled: true,
+            title: {
+                text: "Respiratory Rate (" + myFormattedDate + " - " + myFormattedToday + ")"
+            },
+            subtitles: [
+                {
+                    text: ""
+                }
+            ],
+            data: [
+
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'Base normal',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#FFFF00",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: rrbase
+
+                },
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'Top Normal',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#660066",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: rrtop
+
+                },
+
+                {
+                    type: "line",
+                    showInLegend: true,
+                    name: "My Respiratory Rate",
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#00811F",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: RRarray
+                }]
+        });
+        rrchart.render();
+
+        var oschart = new CanvasJS.Chart("oxySatChartContainer", {
+            theme: "light2",
+            zoomEnabled: true,
+            animationEnabled: true,
+            title: {
+                text: "Oxygen Saturation (" + myFormattedDate + " - " + myFormattedToday + ")"
+            },
+            subtitles: [
+                {
+                    text: ""
+                }
+            ],
+            data: [
+
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'standard',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#00811F",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: osbaseline
+
+                },
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'My Oxygen saturation',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#660066",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: OSarray
+
+                }]
+        });
+        oschart.render();
+
+        var hrchart = new CanvasJS.Chart("hrChartContainer", {
+            theme: "light2",
+            zoomEnabled: true,
+            animationEnabled: true,
+            title: {
+                text: "Heart rate (" + myFormattedDate + " - " + myFormattedToday + ")"
+            },
+            subtitles: [
+                {
+                    text: ""
+                }
+            ],
+            data: [
+
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'Target Heart Rate (Low)',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#FFFF00",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: hrbaselinelow
+
+                }, {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'Target Heart Rate (High)',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#FF0000",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: hrbaselinehigh
+
+                },
+                {
+                    type: 'line',
+                    showInLegend: true,
+                    name: 'My Heart rate',
+                    markerType: "square",
+                    xValuleFormatString: "DD-MM-YY hh:mm TT",
+                    color: "#00811F",
+                    yValueFormatString: "#,##0K",
+                    dataPoints: OSarray
+
+                }]
+        });
+        hrchart.render();
+
+
+    });
+</script>
+<div class="form-horizontal">
+    
+    <h4>My Vitals</h4>
+    
+    
+   
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="bp-tab" data-toggle="tab" href="#bp" role="tab" aria-controls="bp" aria-selected="true">Blood Pressure</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="bodyTemp-tab" data-toggle="tab" href="#bodyTemp" role="tab" aria-controls="bodyTemp" aria-selected="false">Body Temperature</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="bmi-tab" data-toggle="tab" href="#bmi" role="tab" aria-controls="bmi" aria-selected="false">Body weight & Body Height</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" id="rr-tab" data-toggle="tab" href="#rr" role="tab" aria-controls="rr" aria-selected="true">Respiratory Rate</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="oxysat-tab" data-toggle="tab" href="#oxysat" role="tab" aria-controls="oxysat" aria-selected="false">Oxygen Saturation</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="hr-tab" data-toggle="tab" href="#hr" role="tab" aria-controls="hr" aria-selected="false">Heart Rate</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="bp" role="tabpanel" aria-labelledby="bp-tab">
+            <div id="BPChartContainer" class="mt-3"></div>
+        </div>
+        <div class="tab-pane fade" id="bodyTemp" role="tabpanel" aria-labelledby="bodyTemp-tab">
+            <div id="bodyTempChartContainer" class="mt-3"></div>
+        </div>
+        <div class="tab-pane fade" id="bmi" role="tabpanel" aria-labelledby="bmi-tab">
+            <div id="BmiChartContainer" class="mt-3"></div>
+        </div>
+        <div class="tab-pane fade show active" id="rr" role="tabpanel" aria-labelledby="rr-tab">
+            <div id="RRChartContainer" class="mt-3"></div>
+        </div>
+        <div class="tab-pane fade" id="oxysat" role="tabpanel" aria-labelledby="oxysat-tab">
+            <div id="oxySatChartContainer" class="mt-3"></div>
+        </div>
+        <div class="tab-pane fade" id="hr" role="tabpanel" aria-labelledby="hr-tab">
+            <div id="hrChartContainer" class="mt-3"></div>
+            
+        </div>
+    </div>
+</div>
