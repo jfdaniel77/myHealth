@@ -28,12 +28,7 @@ namespace MvcApplication.Controllers
 
             return View();
         }
-        public ActionResult Notifications()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
+        
         public ActionResult MyProfile()
         {
             ViewBag.Message = "Your contact page.";

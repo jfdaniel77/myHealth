@@ -9,10 +9,7 @@ namespace MvcApplication.Controllers
     public class AppointmentController : Controller
     {
         // GET: Appointment
-        public ActionResult Index()
-        {
-            return View();
-        }
+        
         public ActionResult Create()
         {
             return View();

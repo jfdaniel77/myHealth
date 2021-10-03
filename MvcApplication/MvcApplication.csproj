@@ -280,10 +280,10 @@
     <Content Include="Views\Home\Dashboard.cshtml" />
     <Content Include="Views\Home\Medications.cshtml" />
     <Content Include="Views\Home\MyProfile.cshtml" />
-    <Content Include="Views\Home\Notifications.cshtml" />
+
     <Content Include="Views\Appointment\Create.cshtml" />
     <Content Include="Views\Shared\_GiveFeedback.cshtml" />
-    <Content Include="Views\Appointment\View.cshtml" />
+
     <Content Include="Views\MedicalRecords\Create.cshtml" />
     <Content Include="Views\MedicalRecords\Edit.cshtml" />
     <Content Include="Views\MedicalRecords\Patients.cshtml" />

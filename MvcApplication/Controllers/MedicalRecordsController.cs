@@ -23,12 +23,15 @@ namespace MvcApplication.Controllers
         {
             return View();
         }
-
+        public ActionResult Edit()
+        {
+            return View();
+        }
 
         // GET: MedicalRecords/Edit/5
         public ActionResult Patients()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "Search Patients";
 
             return View();
         }
