@@ -285,6 +285,9 @@
     <Content Include="Views\Shared\_GiveFeedback.cshtml" />
     <Content Include="Views\Appointment\View.cshtml" />
     <Content Include="Views\MedicalRecords\Create.cshtml" />
+    <Content Include="Views\MedicalRecords\Edit.cshtml" />
+    <Content Include="Views\MedicalRecords\Patients.cshtml" />
+    <Content Include="Views\MedicalRecords\Vitals.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
