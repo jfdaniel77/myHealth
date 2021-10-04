@@ -13,10 +13,10 @@ namespace MvcApplication.Controllers
                // string email = "thouston@hotmail.com";
                 Session["email"] = email;
             }
-            else
-            {
-                Response.Redirect("~/Account/Login");
-            }
+            // else
+            // {
+            //     Response.Redirect("~/Account/Login");
+            // }
             return View();
         }
         

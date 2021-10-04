@@ -6,6 +6,9 @@
     $(document).ready(function () {
 
         var loginUserEmail = '@Session["email"]';
+        if (loginUserEmail != '' && loginUserEmail != null && loginUserEmail != undefined) {
+            $('#mainNav').prop('style', 'display:none;');
+        }
 
 
     $.ajax(
@@ -76,22 +79,20 @@
 <div class="jumbotron">
     <h1>MyHealth</h1>
     <p class="lead">
-        myhealth is a web application that enables the blah blah blah
+        myhealth is an e-service web application that enables users to create appointments and store health records for use in medical consultations
     </p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
 </div>
 
 <div class="row">
     <div class="col-md-4">
         <h2>Appointments</h2>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit
-        </p>
+        <p>myHealth allows you to set appointments ahead of time with doctors from various medical specialties in Singapore. Let us help you find the right doctor based on your symptoms, required procedures and location.</p>
+
         <p><a class="btn btn-default" href="/Appointment/Appointment">Learn more &raquo;</a></p>
     </div>
     <div class="col-md-4">
         <h2>Health Records</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+        <p> an online summary of your key health information. Give your doctors access to your important health information like medicines, allergies and test results, which can mean safer and more efficient care </p>
         <p><a class="btn btn-default" href="/MedicalRecords/HealthRecords">Learn more &raquo;</a></p>
     </div>
     
