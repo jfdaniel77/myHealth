@@ -9,6 +9,7 @@ namespace MvcApplication.Controllers
     public class MedicalRecordsController : Controller
     {
         // GET: MedicalRecords
+        [Authorize]
         public ActionResult HealthRecords()
         {
             ViewBag.Message = "Your contact page.";
@@ -19,6 +20,7 @@ namespace MvcApplication.Controllers
 
 
         // GET: MedicalRecords/Create
+        [Authorize]
         public ActionResult Create()
         {
             return View();
@@ -29,12 +31,14 @@ namespace MvcApplication.Controllers
         }
 
         // GET: MedicalRecords/Edit/5
+        [Authorize]
         public ActionResult Patients()
         {
             ViewBag.Message = "Search Patients";
 
             return View();
         }
+        [Authorize]
         public ActionResult Vitals()
         {
             ViewBag.Message = "Your contact page.";

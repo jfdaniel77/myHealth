@@ -9,11 +9,12 @@ namespace MvcApplication.Controllers
     public class AppointmentController : Controller
     {
         // GET: Appointment
-        
+        [Authorize]
         public ActionResult Create()
         {
             return View();
         }
+        [Authorize]
         public ActionResult Appointment()
         {
             ViewBag.Message = "Your application description page.";
