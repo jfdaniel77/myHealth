@@ -16,7 +16,7 @@
         $('#txtDate').prop('disabled', true);
         $('#ddlTimeSlots').prop('disabled', true);
         $('#ddlLocation').prop('disabled',true);
-        
+
         $(function () {
             
             var today = new Date();
@@ -41,7 +41,7 @@
 
                 beforeShowDay: checkBadDates
             });
-
+            $('#txtDate').prop('disabled', false);
         });
         $.ajax(
             {
@@ -238,7 +238,7 @@
                         
                     }
                 });
-                $('#txtDate').prop('disabled', false);
+               
 
         }
         else {
@@ -253,7 +253,7 @@
         var slot = $('#ddlTimeSlots').find("option:selected").val();
         var location = $('#ddlLocation').find("option:selected").val();
         var speciality = $('#ddlSpecialty').find("option:selected").text();
-        
+        $('#btnBook').html('<i class="fa fa-spinner"></i> Booking... Please Wait');
         $.ajax(
             {
                 url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/appointment/booking',
@@ -269,8 +269,8 @@
                 }),
                 success: function (data) {
                     sessionStorage.setItem('generatedToken', data.TOKEN);
-                    $('#btnBook').html('<i class="fa fa-spinner"></i> Booking... Please Wait');
-                    //showLoader('Loading, please wait...');
+                    
+                    showLoader('Loading, please wait...');
                     callAPI = true;
                     do {
                         var currentTimestamp = new Date().getTime();
@@ -303,6 +303,7 @@
                        
                     }
                     while (callAPI);
+                    
                     $('#btnBook').html('<i class="fa fa-stethoscope"></i> Book Now');
                     if (bookingstatus == "BOOKED") {
                         $('#resultLoading').hide();
