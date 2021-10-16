@@ -72,7 +72,7 @@
         var mm = myDate.getMonth() + 1;
         var y = myDate.getFullYear();
         var myFormattedDate = dd + '/' + mm + '/' + y;
-
+        myFormattedDate = '01/09/2021';// to comment when go for presentation
 
         var HRarray = [];
         var hrbaselinelow = [];
@@ -491,11 +491,47 @@
 
 
     });
+
+        function addVitals() {
+        var userId = sessionStorage.getItem('loginUserId');
+        $.ajax(
+            {
+
+                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/vitalsign/' + userId ,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                type: 'POST',
+                dataType: 'json',
+                async: false,
+                data: JSON.stringify({
+                    "BP": "120/90",
+                    "BT": "36.5",
+                    "HR": "100",
+                    "RR": "20",
+                    "OS": "98",
+                    "BW": "70",
+                    "BH": "167",
+                    "datetime": "1630989116583"
+
+                }),
+                success: function (data) {
+                    alert('The vital record has been added');
+                    location.reload();
+                }
+            });
+    }
+    function showVitalsEntry(){
+        $('#modalvitals').modal('show');
+    }
+
 </script>
 <div class="form-horizontal">
     
     <h4>My Vitals</h4>
-    
+    <button class="btn btn-info fa fa-plus-circle" onclick="showVitalsEntry()"> Add my Vitals</button>
+
     
    
     <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -536,6 +572,24 @@
         </div>
         <div class="tab-pane fade" id="hr" role="tabpanel" aria-labelledby="hr-tab">
             <div id="hrChartContainer" class="mt-3"></div>
+            
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalvitals" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">record my vitals!</h5>
+                
+            </div>
+            <div class="modal-body">
+                
+
+
+                <button type="button" class="btn btn-success" onclick="addVitals()" ><i class="fa fa-save"></i> Save</button>
+            </div>
             
         </div>
     </div>

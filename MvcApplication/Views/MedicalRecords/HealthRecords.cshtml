@@ -134,36 +134,6 @@
             });
     }
 
-    function addVitals() {
-        var userId = sessionStorage.getItem('loginUserId');
-        $.ajax(
-            {
-
-                url: 'https://kj6snt7kn9.execute-api.ap-southeast-1.amazonaws.com/dev/vitalsign/' + userId ,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-
-                type: 'POST',
-                dataType: 'json',
-                async: false,
-                data: JSON.stringify({
-                    "BP": "120/90",
-                    "BT": "36.5",
-                    "HR": "100",
-                    "RR": "20",
-                    "OS": "98",
-                    "BW": "70",
-                    "BH": "167",
-                    "datetime": "1630989116583"
-
-                }),
-                success: function (data) {
-                    alert('The vital record has been added');
-                    location.reload();
-                }
-            });
-    }
 </script>
 
 <div class="row">
