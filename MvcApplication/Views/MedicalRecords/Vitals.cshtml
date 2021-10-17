@@ -72,7 +72,7 @@
         var mm = myDate.getMonth() + 1;
         var y = myDate.getFullYear();
         var myFormattedDate = dd + '/' + mm + '/' + y;
-        myFormattedDate = '01/09/2021';// to comment when go for presentation
+        myFormattedDate = '01/10/2021';// to comment when go for presentation
 
         var HRarray = [];
         var hrbaselinelow = [];
@@ -494,6 +494,16 @@
 
         function addVitals() {
         var userId = sessionStorage.getItem('loginUserId');
+        var sbp = $('#txtsystolicBP').val();
+        var dbp = $('#txtdiastolicBP').val();
+        var bodyTemp = $('#txtbodyTemperature').val();
+        var bodyWeight = $('#txtbodyWeight').val();
+        var bodyHeight = $('#txtbodyHeight').val();
+        var resRate = $('#txtrespiratoryRate').val();
+        var o2sat = $('#txtoxygensat').val();
+        var heartRate = $('#txtheartrate').val();
+        var bp = dbp +'/'+sbp;
+        
         $.ajax(
             {
 
@@ -506,14 +516,14 @@
                 dataType: 'json',
                 async: false,
                 data: JSON.stringify({
-                    "BP": "120/90",
-                    "BT": "36.5",
-                    "HR": "100",
-                    "RR": "20",
-                    "OS": "98",
-                    "BW": "70",
-                    "BH": "167",
-                    "datetime": "1630989116583"
+                    "BP": bp,
+                    "BT": bodyTemp,
+                    "HR": heartRate,
+                    "RR": resRate,
+                    "OS": o2sat,
+                    "BW": bodyWeight,
+                    "BH": bodyHeight,
+                    "datetime": new Date()
 
                 }),
                 success: function (data) {
@@ -585,7 +595,54 @@
                 
             </div>
             <div class="modal-body">
-                
+                <div class="form-group">
+            <label class = "control-label col-md-2" >Systolic Blood Pressure</label>
+            <div class="col-md-4">
+                <input type="number" id="txtsystolicBP">
+            </div>
+            <label class = "control-label col-md-2" >Diastolic Blood Pressure</label>
+            <div class="col-md-4">
+                <input type="number" id="txtdiastolicBP">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class = "control-label col-md-2" >Body Temperature</label>
+            <div class="col-md-10">
+                <input type="number" id="txtbodyTemperature">
+            </div>
+        </div>
+
+         <div class="form-group">
+            <label class = "control-label col-md-2" >Body Weight</label>
+            <div class="col-md-10">
+                <input type="number" id="txtbodyWeight">
+            </div>
+        </div>
+         <div class="form-group">
+            <label class = "control-label col-md-2" >Body Height</label>
+            <div class="col-md-10">
+                <input type="number" id="txtbodyHeight">
+            </div>
+        </div>
+         <div class="form-group">
+            <label class = "control-label col-md-2" >Respiratory Rate</label>
+            <div class="col-md-10">
+                <input type="number" id="txtrespiratoryRate">
+            </div>
+        </div>
+         <div class="form-group">
+            <label class = "control-label col-md-2" >Oxygen Saturation</label>
+            <div class="col-md-10">
+                <input type="number" id="txtoxygensat">
+            </div>
+        </div>
+         <div class="form-group">
+            <label class = "control-label col-md-2" >Heart Rate</label>
+            <div class="col-md-10">
+                <input type="number" id="txtheartrate">
+            </div>
+        </div>
 
 
                 <button type="button" class="btn btn-success" onclick="addVitals()" ><i class="fa fa-save"></i> Save</button>
